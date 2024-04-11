@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} - %thread - [%level] - %class->%M->%line: %m%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 按文件大小区分的滚动日志 -->
+    <appender name="FILE-SIZE-OUT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/log.log</file>
+
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} - %thread - [%level] - %class->%M->%line: %m%n</pattern>
+        </encoder>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>logs/log.size.%i.log</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>10</maxIndex>
+        </rollingPolicy>
+
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>24MB</maxFileSize>
+        </triggeringPolicy>
+    </appender>
+
+    <!--按天分割日志-->
+    <appender name="FILE-DAY-OUT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/log.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>5</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} - %thread - [%level] - %class->%M->%line: %m%n</pattern>
+        </encoder>
+
+    </appender>
+
+    <!--开发测试环境配置 start-->
+    <logger name="org.springframework" level="INFO"/>
+    <logger name="com.uccc" level="DEBUG"/>
+
+    <logger name="org.apache" level="INFO"/>
+    <logger name="com.mchange.v2" level="INFO"/>
+    <logger name="org.quartz" level="INFO"/>
+    <logger name="com.zaxxer.hikari" level="INFO"/>
+
+    <root level="DEBUG">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE-DAY-OUT" />
+    </root>
+    <!--开发测试环境配置 end-->
+
+</configuration>
