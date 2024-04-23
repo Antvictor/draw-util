@@ -28,9 +28,9 @@ public class ImageUtils {
     public static BufferedImage mergeWord(int initX, int initY,
                                           int endX, int endY, int spacing,
                                           BufferedImage sourceImage,
-                                          String word
+                                          String word, String fontName
     ) {
-        Font font = new Font(null, Font.PLAIN, 30);
+        Font font = new Font(fontName, Font.PLAIN, 30);
         Color color = new Color(0, 0, 0);
         return mergeWord(initX, initY, endX, endY, spacing, sourceImage, word,
                 font, color, ImageAlign.LEFT, true, true, true);
@@ -118,9 +118,38 @@ public class ImageUtils {
 
         Graphics2D graphics2D = sourceImage.createGraphics();
 
-        initX = drawXAndY(align, initX, endX, image.getWidth());
-//        initY = drawXAndY(align, initY, endY, image.getHeight());
+        return drawImage(initX, initY, endX, endY, sourceImage, image, align, graphics2D);
+    }
+
+    public static BufferedImage mergeImage(int initX, int initY,
+                                           int endX, int endY,
+                                           BufferedImage sourceImage,
+                                           BufferedImage image,
+                                           ImageAlign align, boolean isScale
+    ) {
+
+        Graphics2D graphics2D = sourceImage.createGraphics();
+
         // 缩放图片
+        if (isScale) {
+            // 等比缩放
+            double scaleFactor = Math.min((double) (endX - initX) / image.getWidth(),
+                    (double) (endY - initY) / image.getHeight());
+            if (scaleFactor < 1) {
+                image = scaleImage(image, scaleFactor);
+            }
+        }
+
+        return drawImage(initX, initY, endX, endY, sourceImage, image, align, graphics2D);
+    }
+
+    private static BufferedImage drawImage(int initX, int initY, int endX, int endY, BufferedImage sourceImage, BufferedImage image, ImageAlign align, Graphics2D graphics2D) {
+        initX = drawXAndY(align, initX, endX, image.getWidth());
+        // 横向只居中
+        if (align == ImageAlign.CENTER) {
+            initY = drawXAndY(align, initY, endY, image.getHeight());
+        }
+
         graphics2D.drawImage(image, initX, initY, Math.min(image.getWidth(), endX - initX), Math.min(image.getHeight(), endY - initY), null);
         graphics2D.dispose();
         return sourceImage;
@@ -159,8 +188,8 @@ public class ImageUtils {
      * @return
      */
     public static BufferedImage scaleImage(BufferedImage originalImage, double scaleFactor) {
-        int targetWidth = (int) (originalImage.getWidth() * (1-scaleFactor));
-        int targetHeight = (int) (originalImage.getHeight() * (1-scaleFactor));
+        int targetWidth = (int) (originalImage.getWidth() * scaleFactor);
+        int targetHeight = (int) (originalImage.getHeight() * scaleFactor);
         BufferedImage scaledImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics2D = scaledImage.createGraphics();
         graphics2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
